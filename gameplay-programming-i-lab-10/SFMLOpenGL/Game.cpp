@@ -75,6 +75,14 @@ void Game::initialize()
 	vertex[2].coordinate[1] = 0.5f;
 	vertex[2].coordinate[2] = 0.0f;
 
+	vertex[3].coordinate[0] = 1.0f;
+	vertex[3].coordinate[1] = 1.0f;
+	vertex[3].coordinate[2] = 0.0f;
+
+
+
+
+
 	vertex[0].color[0] = 0.0f;
 	vertex[0].color[1] = 0.0f;
 	vertex[0].color[2] = 0.0f;
@@ -89,6 +97,11 @@ void Game::initialize()
 	vertex[2].color[1] = 0.0f;
 	vertex[2].color[2] = 0.0f;
 	vertex[2].color[3] = 1.0f;
+
+	vertex[3].color[0] = 0.0f;
+	vertex[3].color[1] = 0.0f;
+	vertex[3].color[2] = 0.0f;
+	vertex[3].color[3] = 1.0f;
 
 	/*Index of Poly / Triangle to Draw */
 	triangles[0] = 0;   triangles[1] = 1;   triangles[2] = 2;
@@ -257,7 +270,7 @@ void Game::render()
 	// Set pointers for each parameter
 	// https://www.opengl.org/sdk/docs/man4/html/glVertexAttribPointer.xhtml
 	glVertexAttribPointer(positionID, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
-	glVertexAttribPointer(colorID, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
+	glVertexAttribPointer(colorID, 6, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
 
 	//Enable Arrays
 	glEnableVertexAttribArray(positionID);
