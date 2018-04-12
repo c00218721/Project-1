@@ -1,6 +1,7 @@
 #include <Game.h>
 #include <Cube.h>
 #include <Easing.h>
+#include <NPC.h>
 
 // Helper to convert Number to String for HUD
 template <typename T>
@@ -19,14 +20,20 @@ GLuint	vsid,		// Vertex Shader ID
 		vib,		// Vertex Index Buffer
 		to[1];		// Texture ID
 GLint	positionID,	// Position ID
-		colorID,	// Color ID
-		textureID,	// Texture ID
-		uvID,		// UV ID
-		mvpID,		// Model View Projection ID
-		x_offsetID, // X offset ID
-		y_offsetID,	// Y offset ID
-		z_offsetID;	// Z offset ID
-
+colorID,	// Color ID
+textureID,	// Texture ID
+uvID,		// UV ID
+mvpID,		// Model View Projection ID
+x_offsetID, // X offset ID
+y_offsetID,	// Y offset ID
+z_offsetID,	// Z offset ID
+positionID_NPC,	// Position ID
+colorID_NPC,	// Color ID
+textureID_NPC,	// Texture ID
+uvID_NPC,		// UV ID
+mvpID_NPC;	// Model View Projection ID
+		
+	
 GLenum	error;		// OpenGL Error Code
 
 
@@ -39,8 +46,10 @@ int comp_count;					// Component of texture
 
 unsigned char* img_data;		// image data
 
-mat4 mvp, projection, 
-		view, model;			// Model View Projection
+mat4 mvp,mvp_npc, projection, 
+		view, model  , model_npc;			// Model View Projection
+
+
 
 Font font;						// Game font
 
@@ -210,6 +219,8 @@ void Game::initialize()
 
 	// Vertices (3) x,y,z , Colors (4) RGBA, UV/ST (2)
 	glBufferData(GL_ARRAY_BUFFER, ((3 * VERTICES) + (4 * COLORS) + (2 * UVS)) * sizeof(GLfloat), NULL, GL_STATIC_DRAW);
+	//
+	glBufferData(GL_ARRAY_BUFFER, ((3 * VERTICES_NPC) + (4 * COLORS_NPC) + (2 * UVS)) * sizeof(GLfloat), NULL, GL_STATIC_DRAW);
 
 	glGenBuffers(1, &vib); //Generate Vertex Index Buffer
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vib);
@@ -217,6 +228,8 @@ void Game::initialize()
 	// Indices to be drawn
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3 * INDICES * sizeof(GLuint), indices, GL_STATIC_DRAW);
 
+	//
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3 * INDICES_NPC * sizeof(GLuint), indices_NPC, GL_STATIC_DRAW);
 	// NOTE: uniforms values must be used within Shader so that they 
 	// can be retreived
 	const char* vs_src =
@@ -363,8 +376,18 @@ void Game::initialize()
 
 	// Model matrix
 	model = mat4(
+		1.0f
+	);
+
+
+	model_npc = mat4(
 		1.0f					// Identity Matrix
 		);
+
+	model = translate(model_npc, glm::vec3(0.0, -1.0, 4.0));
+
+	model_npc = translate(model_npc, glm::vec3(0.0, -1.0, 4.0));
+	
 
 	// Enable Depth Test
 	glEnable(GL_DEPTH_TEST);
@@ -384,10 +407,17 @@ void Game::update()
 	// For mutiple objects (cubes) create multiple models
 	// To alter Camera modify view & projection
 	mvp = projection * view * model;
+	mvp_npc = projection * view * model_npc;
+
+
 
 	DEBUG_MSG(model[0].x);
 	DEBUG_MSG(model[0].y);
 	DEBUG_MSG(model[0].z);
+
+	DEBUG_MSG(model_npc[0].x);
+	DEBUG_MSG(model_npc[0].y);
+	DEBUG_MSG(model_npc[0].z);
 }
 
 void Game::render()
@@ -437,35 +467,64 @@ void Game::render()
 	positionID = glGetAttribLocation(progID, "sv_position");
 	if (positionID < 0) { DEBUG_MSG("positionID not found"); }
 
+	positionID_NPC = glGetAttribLocation(progID, "sv_position");
+	if (positionID_NPC < 0) { DEBUG_MSG("positionID_NPC not found"); }
+
+	colorID_NPC = glGetAttribLocation(progID, "sv_color");
+	if (colorID_NPC < 0) { DEBUG_MSG("colorID_NPC not found"); }
+
 	colorID = glGetAttribLocation(progID, "sv_color");
 	if (colorID < 0) { DEBUG_MSG("colorID not found"); }
 
 	uvID = glGetAttribLocation(progID, "sv_uv");
 	if (uvID < 0) { DEBUG_MSG("uvID not found"); }
 
+	uvID_NPC = glGetAttribLocation(progID, "sv_uv");
+	if (uvID_NPC < 0) { DEBUG_MSG("uvID_NPC not found"); }
+
 	textureID = glGetUniformLocation(progID, "f_texture");
 	if (textureID < 0) { DEBUG_MSG("textureID not found"); }
+
+	textureID_NPC = glGetUniformLocation(progID, "f_texture");
+	if (textureID_NPC < 0) { DEBUG_MSG("textureID_NPC not found"); }
 
 	mvpID = glGetUniformLocation(progID, "sv_mvp");
 	if (mvpID < 0) { DEBUG_MSG("mvpID not found"); }
 
+	mvpID_NPC = glGetUniformLocation(progID, "sv_mvp");
+	if (mvpID_NPC < 0) { DEBUG_MSG("mvpID_NPC not found"); }
+
 	x_offsetID = glGetUniformLocation(progID, "sv_x_offset");
 	if (x_offsetID < 0) { DEBUG_MSG("x_offsetID not found"); }
+
+
 
 	y_offsetID = glGetUniformLocation(progID, "sv_y_offset");
 	if (y_offsetID < 0) { DEBUG_MSG("y_offsetID not found"); }
 
+
+
 	z_offsetID = glGetUniformLocation(progID, "sv_z_offset");
 	if (z_offsetID < 0) { DEBUG_MSG("z_offsetID not found"); };
+
+
+
 
 	// VBO Data....vertices, colors and UV's appended
 	glBufferSubData(GL_ARRAY_BUFFER, 0 * VERTICES * sizeof(GLfloat), 3 * VERTICES * sizeof(GLfloat), vertices);
 	glBufferSubData(GL_ARRAY_BUFFER, 3 * VERTICES * sizeof(GLfloat), 4 * COLORS * sizeof(GLfloat), colors);
 	glBufferSubData(GL_ARRAY_BUFFER, ((3 * VERTICES) + (4 * COLORS)) * sizeof(GLfloat), 2 * UVS * sizeof(GLfloat), uvs);
 
+	glDrawElements(GL_TRIANGLES, 3 * INDICES, GL_UNSIGNED_INT, NULL);
+	
+//VBO DATA for the npc
+	glBufferSubData(GL_ARRAY_BUFFER, 0 * VERTICES_NPC * sizeof(GLfloat), 3 * VERTICES_NPC * sizeof(GLfloat), vertices_NPC);
+	glBufferSubData(GL_ARRAY_BUFFER, 3 * VERTICES_NPC * sizeof(GLfloat), 4 * COLORS_NPC * sizeof(GLfloat), colors_NPC);
+	glBufferSubData(GL_ARRAY_BUFFER, ((3 * VERTICES_NPC) + (4 * COLORS_NPC)) * sizeof(GLfloat), 2 * UVS_NPC * sizeof(GLfloat), uvs);
+
 	// Send transformation to shader mvp uniform [0][0] is start of array
 	glUniformMatrix4fv(mvpID, 1, GL_FALSE, &mvp[0][0]);
-
+	glUniformMatrix4fv(mvpID_NPC, 1, GL_FALSE, &mvp_npc[0][0]);
 	// Set Active Texture .... 32 GL_TEXTURE0 .... GL_TEXTURE31
 	glActiveTexture(GL_TEXTURE0);
 	glUniform1i(textureID, 0); // 0 .... 31
@@ -481,6 +540,10 @@ void Game::render()
 	glVertexAttribPointer(positionID, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glVertexAttribPointer(colorID, 4, GL_FLOAT, GL_FALSE, 0, (VOID*)(3 * VERTICES * sizeof(GLfloat)));
 	glVertexAttribPointer(uvID, 2, GL_FLOAT, GL_FALSE, 0, (VOID*)(((3 * VERTICES) + (4 * COLORS)) * sizeof(GLfloat)));
+
+	glVertexAttribPointer(positionID_NPC, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(colorID_NPC, 4, GL_FLOAT, GL_FALSE, 0, (VOID*)(3 * VERTICES_NPC * sizeof(GLfloat)));
+	glVertexAttribPointer(uvID_NPC, 2, GL_FLOAT, GL_FALSE, 0, (VOID*)(((3 * VERTICES_NPC) + (4 * COLORS_NPC)) * sizeof(GLfloat)));
 	
 	// Enable Arrays
 	glEnableVertexAttribArray(positionID);
@@ -488,7 +551,8 @@ void Game::render()
 	glEnableVertexAttribArray(uvID);
 
 	// Draw Element Arrays
-	glDrawElements(GL_TRIANGLES, 3 * INDICES, GL_UNSIGNED_INT, NULL);
+	
+	glDrawElements(GL_TRIANGLES, 3 * INDICES_NPC, GL_UNSIGNED_INT, NULL);
 	window.display();
 
 	// Disable Arrays
