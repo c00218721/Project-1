@@ -19,33 +19,30 @@ GLuint	vertShader,
 		to[1];		// Texture ID
 GLint	positionID,	// Position ID
 		colorID,	// Color ID
+		mvpID[3],	// Model View Projection ID
 		textureID,	// Texture ID
 		uvID,		// UV ID
-		mvpID[3],	// Model View Projection ID
 		x_offsetID, // X offset ID
 		y_offsetID,	// Y offset ID
 		z_offsetID;	// Z offset ID
 
 GLenum	error;		// OpenGL Error Code
 
+int width;				
+int height;					
+int comp_count;					
 const int PLAYER = 0;
 const int PROJ = 1;
 const int GOAL = 2;
-
-//Please see .//Assets//Textures// for more textures
 const std::string filename = ".//Assets//Textures//cube.tga";
+float x_offset, y_offset, z_offset; // offset on screen (Vertex Shader)
 
-int width;						// Width of texture
-int height;						// Height of texture
-int comp_count;					// Component of texture
 
 unsigned char* img_data;		// image data
 
-glm::mat4 mvp[3], projection, view;	// Model View Projection
-
+glm::mat4 mvp[3], projection, view;	// Model View Projectio
 sf::Font font;						// Game font
 
-float x_offset, y_offset, z_offset; // offset on screen (Vertex Shader)
 
 Game::Game() : 
 	m_window(sf::VideoMode(800, 600),	"Introduction to OpenGL Texturing")
@@ -77,10 +74,15 @@ void Game::run()
 		DEBUG_MSG("Game running...");
 #endif
 		processEvents(); // as many as possible
+
+
 		timeSinceLastUpdate += clock.restart();
+
 		while (timeSinceLastUpdate > timePerFrame && isRunning)
 		{
+
 			timeSinceLastUpdate -= timePerFrame;
+
 			processEvents(); // as many as possible
 			update(timePerFrame); //60 fps
 		}
@@ -109,7 +111,10 @@ void Game::processEvents()
 			if (sf::Keyboard::Escape == event.key.code)
 			{
 				m_exitGame = true;
+
 			}
+
+
 		}
 	}
 }
@@ -334,8 +339,11 @@ void Game::unload()
 
 void Game::checkCollsions()
 {
-	if (glm::distance(glm::vec3(m_bulletCube.getModel()[3].x, m_bulletCube.getModel()[3].y, m_bulletCube.getModel()[3].z), glm::vec3(-5, 0, -15)) <= 1.5f)
-	{//checks if in certain distance of goal cube and if not loose life
+	if (glm::distance(glm::vec3(m_bulletCube.getModel()[3].x,
+								m_bulletCube.getModel()[3].y,
+								m_bulletCube.getModel()[3].z),
+								glm::vec3(-5, 0, -15)) <= 1.5f)
+	{//checks idistance of goal from cube
 		if (m_scoreArea.getPosition() == 1)
 		{
 			m_score += 100;
