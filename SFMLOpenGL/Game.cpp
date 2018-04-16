@@ -34,7 +34,7 @@ int comp_count;
 const int PLAYER = 0;
 const int PROJ = 1;
 const int GOAL = 2;
-const std::string filename = ".//Assets//Textures//cube.tga";
+const std::string filename = ".//Assets//Textures//cube.tga"; //opens texture from file
 float x_offset, y_offset, z_offset; // offset on screen (Vertex Shader)
 
 
@@ -349,15 +349,13 @@ void Game::checkCollsions()
 			m_score += 100;
 			changeGoal();
 			moving = false;
-		}
-		//else
-		//{
-		//	m_lives--;
-		//}
-	
+		}	
 	}
 	
-	if (glm::distance(glm::vec3(m_bulletCube.getModel()[3].x, m_bulletCube.getModel()[3].y, m_bulletCube.getModel()[3].z), glm::vec3(0, 0, -15)) <= 1.5f)
+	if (glm::distance(glm::vec3(m_bulletCube.getModel()[3].x,
+								m_bulletCube.getModel()[3].y,
+								m_bulletCube.getModel()[3].z),
+								glm::vec3(0, 0, -15)) <= 1.5f)
 	{
 		if (m_scoreArea.getPosition() == 2)
 		{
@@ -365,14 +363,12 @@ void Game::checkCollsions()
 			changeGoal();
 			moving = false;
 		}
-		//else
-		//{
-		//	m_lives--;
-		//}
-
 	}
 	
-	if (glm::distance(glm::vec3(m_bulletCube.getModel()[3].x, m_bulletCube.getModel()[3].y, m_bulletCube.getModel()[3].z), glm::vec3(5, 0, -15)) <= 1.5f)
+	if (glm::distance(glm::vec3(m_bulletCube.getModel()[3].x,
+								m_bulletCube.getModel()[3].y,
+								m_bulletCube.getModel()[3].z),
+								glm::vec3(5, 0, -15)) <= 1.5f)
 	{
 		if (m_scoreArea.getPosition() == 3)
 		{
@@ -380,13 +376,7 @@ void Game::checkCollsions()
 			changeGoal();
 			moving = false;
 		}
-		//else
-		//{
-		//	m_lives--;
-		//}
-	
 	}
-
 }
 
 void Game::changeGoal()
@@ -499,6 +489,10 @@ void Game::doInput(sf::Time t_deltaTime)
 {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 	{
+		/// <summary>
+		///creates new matrix that holds ytranslated player and later assigns it to player
+		/// </summary>
+		/// <param name="t_deltaTime"></param>
 		glm::mat4 mat = glm::translate(m_playerModel.getModel(), glm::vec3(-0.005 * t_deltaTime.asMilliseconds(), 0, 0));
 		m_playerModel.setCube(mat);
 	}
@@ -511,6 +505,7 @@ void Game::doInput(sf::Time t_deltaTime)
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && !moving)
 	{
+		// shoooooooooooooooooooooooooooooot: gets position par tof the matrix and sets to cube so it spawns in 
 		m_bulletCube.goToPlayer(m_playerModel.getModel());
 		moving = true;
 	}
@@ -527,8 +522,8 @@ void Game::setShader()
 	vertShader = glCreateShader(GL_VERTEX_SHADER);
 	fragShader = glCreateShader(GL_FRAGMENT_SHADER);
 
-	vs = textFileRead("cube.vert");
-	fs = textFileRead("cube.frag");
+	vs = textFileRead("cube.vert");//loads in the vertex shader code
+	fs = textFileRead("cube.frag");//loads in the fragment shader code
 
 	const char * vv = vs;
 	const char * ff = fs;
@@ -562,21 +557,20 @@ void Game::setShader()
 	{
 		DEBUG_MSG("ERROR: Fragment Shader Compilation Error");
 	}
-
 	//DEBUG_MSG("Setting Up and Linking Shader");
 	progID = glCreateProgram();	//Create program in GPU
 	glAttachShader(progID, vertShader); //Attach Vertex Shader to Program
 	glAttachShader(progID, fragShader); //Attach Fragment Shader to Program
 	glLinkProgram(progID);
-
 	//Check is Shader Linked
 	glGetProgramiv(progID, GL_LINK_STATUS, &isLinked);
-
 	if (isLinked == 1) {
 		DEBUG_MSG("Shader Linked");
 	}
 	else
 	{
+
+
 		DEBUG_MSG("ERROR: Shader Link Error");
 	}
 
