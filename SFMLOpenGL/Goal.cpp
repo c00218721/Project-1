@@ -35,7 +35,7 @@ void Goal::init()
 void Goal::loadIdentity()
 {
 	cube = glm::mat4(
-		1.0f					// Identity Matrix
+		1.0f// goal Matrix
 	);
 }
 

@@ -485,32 +485,6 @@ void Game::initCubes()
 	m_lives = 5;
 }
 
-void Game::doInput(sf::Time t_deltaTime)
-{
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-	{
-		/// <summary>
-		///creates new matrix that holds ytranslated player and later assigns it to player
-		/// </summary>
-		/// <param name="t_deltaTime"></param>
-		glm::mat4 mat = glm::translate(m_playerModel.getModel(), glm::vec3(-0.005 * t_deltaTime.asMilliseconds(), 0, 0));
-		m_playerModel.setCube(mat);
-	}
-
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-	{
-		glm::mat4 mat = glm::translate(m_playerModel.getModel(), glm::vec3(0.005 * t_deltaTime.asMilliseconds(), 0, 0));
-		m_playerModel.setCube(mat);
-	}
-
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && !moving)
-	{
-		// shoooooooooooooooooooooooooooooot: gets position par tof the matrix and sets to cube so it spawns in 
-		m_bulletCube.goToPlayer(m_playerModel.getModel());
-		moving = true;
-	}
-}
-
 void Game::setShader()
 {
 	GLint isCompiled = 0;
@@ -583,3 +557,31 @@ void Game::setShader()
 	positionID = glGetAttribLocation(progID, "sv_position");
 	//colorID = glGetAttribLocation(progID, "sv_color");
 }
+
+void Game::doInput(sf::Time t_deltaTime)
+{
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+	{
+		/// <summary>
+		///creates new matrix that holds ytranslated player and later assigns it to player
+		/// </summary>
+		/// <param name="t_deltaTime"></param>
+		glm::mat4 mat = glm::translate(m_playerModel.getModel(), glm::vec3(-0.005 * t_deltaTime.asMilliseconds(), 0, 0));
+		m_playerModel.setCube(mat);
+	}
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+	{
+		glm::mat4 mat = glm::translate(m_playerModel.getModel(), glm::vec3(0.005 * t_deltaTime.asMilliseconds(), 0, 0));
+		m_playerModel.setCube(mat);
+	}
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && !moving)
+	{
+		// shoooooooooooooooooooooooooooooot: gets position par tof the matrix and sets to cube so it spawns in 
+		m_bulletCube.goToPlayer(m_playerModel.getModel());
+		moving = true;
+	}
+}
+
+
